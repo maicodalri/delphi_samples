@@ -154,12 +154,12 @@ begin
     //Not to use all the processor processing
     Sleep(Self.FInterval);
 
-    //Increase que possiotion os progressbar
+    //Increase que possiotion os progressbar (not in VCL)
     Self.Position:= Self.Position + 1;
     if Self.Position >= 100 then
       Self.Position:= 0;
 
-    //The information do show to user
+    //The information do show to user (not in VCL)
     case Self.Position of
       01: Self.Information:= 'Initializing...';
       20: Self.Information:= 'Some information...';
@@ -174,9 +174,10 @@ begin
       begin
         Self.FLabel.Caption:= Self.Information;
         Self.FProgressBar.Position := Self.Position;
-        TFileTextLog.WriteLog('Thread id ' + IntToStr(Self.ThreadID) + ' - Update screen');
+        TFileTextLog.WriteLog('Thread id ' + IntToStr(Self.ThreadID) + ' - Update screen (VCL)');
       end);
 
+    TFileTextLog.WriteLog('Thread id ' + IntToStr(Self.ThreadID) + ' - End Loop');
   end;
   Self.Terminate;
 end;
