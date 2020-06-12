@@ -12,7 +12,7 @@ type
   public
     class constructor ClassCreate;
     class destructor ClassDestroy;
-    class procedure SaveLog(const lText: string);
+    class procedure WriteLog(const lText: string);
   end;
 
 implementation
@@ -21,33 +21,46 @@ implementation
 
 class constructor TFileTextLog.ClassCreate;
 begin
+  //Create a TCriticalSection to use
   TFileTextLog.FCriticalSection:= TCriticalSection.Create;
 end;
 
 class destructor TFileTextLog.ClassDestroy;
 begin
+  //Destroy a TCriticalSection
   TFileTextLog.FCriticalSection.Free;
 end;
 
-class procedure TFileTextLog.SaveLog(const lText: string);
+class procedure TFileTextLog.WriteLog(const lText: string);
 var
   lFileLogName: string;
-  lArquivo: TextFile;
+  lFile: TextFile;
 begin
+  //Enter in the Critical Section (resource to be protected)
   TFileTextLog.FCriticalSection.Enter;
-  try
+  
+  try //Protected block
+
+    //Set the file name
     lFileLogName:= ChangeFileExt(ParamStr(0), '.log');
-    AssignFile(lArquivo, lFileLogName);
+    //Assigne the file name to the file
+    AssignFile(lFile, lFileLogName);
     try
-      if not FileExists(lFileLogName) then
-        Rewrite(lArquivo)
+      if not FileExists(lFileLogName) then  //If file exist
+        Rewrite(lFile) //Then create it
       else
-        Append(lArquivo);
-      WriteLn(lArquivo, FormatDateTime('dd/mm/yyyy hh:mm:ss:zzz', Now) + ' => ' + lText);
+        Append(lFile); //Else only open to add lines
+        
+      //Write line into the text file
+      WriteLn(lFile,
+              FormatDateTime('dd/mm/yyyy hh:mm:ss:zzz', Now) + ' => ' + lText);
     finally
-      CloseFile(lArquivo);
+      //Tells the operating system that the file will no
+      // longer be used in this procedure
+      CloseFile(lFile); //CLose the file
     end;
   finally
+    //Exit to the crítical section
     TFileTextLog.FCriticalSection.Release;
   end;
 end;

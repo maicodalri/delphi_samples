@@ -44,8 +44,6 @@ object frmMain: TfrmMain
       Caption = 'Save Log Now'
       TabOrder = 1
       OnClick = btnSaveLogClick
-      ExplicitLeft = 0
-      ExplicitTop = 6
     end
   end
   object ScrollBox: TScrollBox
